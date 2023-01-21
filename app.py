@@ -47,7 +47,7 @@ app.layout = html.Div([
             {'label': 'Sci-Fi', 'value': 'sci-fi'},
             {'label': 'Thriller', 'value': 'thriller'}
         ],
-        value='fantasys'
+        value='fantasy'
         ),
     ],
     className="custom-div",
