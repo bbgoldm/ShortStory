@@ -1,7 +1,8 @@
-from dash import Dash, html, dcc, callback, no_update, callback_context
+from dash import Dash, html, dcc, callback, no_update, callback_context, ctx
 from dash.dependencies import Output, Input, State
 from dash.exceptions import PreventUpdate
 import dash_bootstrap_components as dbc
+import dash_loading_spinners as dls
 import requests # used for making HTTP requests.  Built on urllib3.
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
@@ -9,7 +10,6 @@ app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 app.layout = html.Div([
     html.H1("Short Story Creator", className='custom-div'),
 
-    # dcc.Input(id='prompt', placeholder='Enter a prompt...', type='text'),
     html.Div(
     [        
         dbc.Input(id="prompt", placeholder="Enter some keywords or a description for your short-story...", type="text"),
@@ -24,12 +24,13 @@ app.layout = html.Div([
         dcc.Dropdown(
             id="length",
             options=[
-                {'label': 'Short', 'value': 'short'},
-                {'label': 'Medium', 'value': 'medium'},
-                {'label': 'Long', 'value': 'long'}
+                {'label': 'Short: 50-100 words', 'value': 'short'},
+                {'label': 'Medium: 100-150 words', 'value': 'medium'},
+                {'label': 'Long: 150-200 words', 'value': 'long'}
             ],
             value='short'
         ),
+        dbc.FormText("*Longer stories will take longer time to generate."),
     ],
     className="custom-div",
     ),
@@ -59,11 +60,17 @@ app.layout = html.Div([
     ]
     ),
 
-    html.Div(id='loading', children="Please wait for story to be generated", style={'display': 'block'}),
-    
-    html.Div(
-        [html.Div(id='output')]
-    ,style={'marginTop':'40px', 'marginBottom':'40px'}),
+     html.Div(
+        # dls is a spinner generator while waiting for story to load
+        # https://dash-loading-spinners.sproodlebuzz.co.uk/
+        dls.Pacman(
+            [html.Div(id='output')],
+            color="#3800D1",
+            speed_multiplier=1,
+            width=100,
+        )
+    ,style={'width':'50%','marginTop':'40px', 'marginBottom':'40px'}
+    ),
 
     html.Div(
     [
@@ -72,13 +79,7 @@ app.layout = html.Div([
     ]
     , id='regenerate_button', style={'display': 'none'}),
 
-    dcc.Interval(id='loading_interval', interval=100000000000),
-
 ])
-
-# ------------------------------------------------------------
-# Begin Callbacks
-# ------------------------------------------------------------
 
 # Callback to generate a user story
 @app.callback(
@@ -103,18 +104,6 @@ def update_output(n_clicks, regen_nclicks, prompt, length, genre):
             return 'Error'
     except requests.exceptions.RequestException as e:
         raise e
-
-# Callback to display a loading message to the user
-@app.callback(
-    Output("loading", "style"),
-    [Input("loading_interval", "n_intervals"),
-    Input("output", "children")],
-    prevent_initial_call=True)
-def update_loading_text(n_intervals, output):
-    if not output:
-        return {"display": "block"}
-    else:
-        return {"display": "none"}
 
 # Callback to display the Regenerate Button after story is generated
 @app.callback(

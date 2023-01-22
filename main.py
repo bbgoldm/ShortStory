@@ -3,7 +3,7 @@ from fastapi import FastAPI, HTTPException, Query
 
 app = FastAPI()
 
-openai.api_key = "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"
+openai.api_key = ""
 
 @app.get("/openai")
 async def generate_story(prompt: str, length: str = Query(None, title='Story Length', description='The length of the story (short, medium, long)'), 
@@ -11,7 +11,7 @@ genre: str = Query(None, title='Story Genre', description='The genre of the stor
     try:
         if length:
             if "short" in length:
-                length = ", 50-100 words, "
+                length = " 50-100 words "
             elif "medium" in length:
                 length = ", 100-150 words, "
             elif "long" in length:
