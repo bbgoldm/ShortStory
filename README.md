@@ -19,4 +19,4 @@
 ## UML sequence diagram showing how requesting and receiving data work. 
 
 ![image](https://user-images.githubusercontent.com/50001855/216782559-7ddb72dc-7992-42f1-a89f-0d3f4afb1cba.png)
-
+*Generated using visual-paradigm.com
